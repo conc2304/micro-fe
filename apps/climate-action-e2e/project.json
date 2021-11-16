@@ -1,0 +1,28 @@
+{
+  "root": "apps/climate-action-e2e",
+  "sourceRoot": "apps/climate-action-e2e/src",
+  "projectType": "application",
+  "targets": {
+    "e2e": {
+      "executor": "@nrwl/cypress:cypress",
+      "options": {
+        "cypressConfig": "apps/climate-action-e2e/cypress.json",
+        "devServerTarget": "climate-action:serve"
+      },
+      "configurations": {
+        "production": {
+          "devServerTarget": "climate-action:serve:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/climate-action-e2e/**/*.{js,ts}"]
+      }
+    }
+  },
+  "tags": [],
+  "implicitDependencies": ["climate-action"]
+}

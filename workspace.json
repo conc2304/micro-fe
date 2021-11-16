@@ -1,4 +1,7 @@
 {
   "version": 2,
-  "projects": {}
+  "projects": {
+    "climate-action": "apps/climate-action",
+    "climate-action-e2e": "apps/climate-action-e2e"
+  }
 }
