@@ -7,7 +7,7 @@ import './P5Canvas.module.scss';
 export interface P5CanvasProps {}
 
 export function P5Canvas(props: P5CanvasProps) {
-  const dampening = 0.995;
+  const dampening = 0.99;
   const { width, height } = getDocumentDimensions();
   const [pageWidth, setWidth] = useState(width);
   const [pageHeight, setHeight] = useState(height);
