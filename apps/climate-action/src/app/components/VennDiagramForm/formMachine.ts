@@ -28,11 +28,12 @@ const initialContext: FormContext = {
 
 const onSubmit = (formData: InputFieldNames) => {
   console.log('SUBMITTING');
+  const createdAt = new Date();
   return new Promise((resolve, reject) => {
     const url = `${process.env.NX_SHEETS_BASE_URL}/${process.env.NX_SHEETS_CONNECTION_ID}`;
     const data = {
       ...formData,
-      'created at': new Date(),
+      'created at': createdAt
     };
 
     remoteApiPostData(url, data)
@@ -43,6 +44,8 @@ const onSubmit = (formData: InputFieldNames) => {
       .then((response) => {
         console.log('SUCCESS');
         resolve('SUCCESS');
+        const formPostData = JSON.stringify({name: formData.name, 'created at': createdAt})
+        localStorage.setItem('formPost', formPostData);
       })
       .catch((e) => {
         console.log(e);

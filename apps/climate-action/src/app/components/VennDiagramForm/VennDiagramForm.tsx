@@ -53,7 +53,7 @@ export function VennDiagramForm(props: VennDiagramFormProps) {
 
       <div>
         {!current.matches('success') &&
-          formFields.map(({ id, label, placeholder, value }) => {
+          formFields.map(({ id, label, placeholder }) => {
             return (
               <div key={id} className="field-wrapper">
                 <TextField
