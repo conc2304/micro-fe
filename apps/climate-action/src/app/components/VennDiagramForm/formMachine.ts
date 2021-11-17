@@ -23,7 +23,7 @@ const initialContext: FormContext = {
 };
 
 const onSubmit = () => {
-  console.log('HERE');
+  console.log('SUBMITTING');
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const dice = Math.floor(Math.random() * Math.floor(2));
@@ -86,7 +86,6 @@ export const formMachine = createMachine(
       onChange: assign({
         inputValues: (ctx, e: any) => {
           const { key, value } = e.data;
-          console.log('CAHNGE ----- ');
           return {
             ...ctx.inputValues,
             [key]: value,
@@ -100,22 +99,23 @@ export const formMachine = createMachine(
         },
       }),
       clearForm: () => {
-        console.log('CLEAR FORM');
+        assign({
+          inputValues: () => initialContext.inputValues,
+          errors: () => initialContext.errors,
+        });
       },
     },
     guards: {
       formIsCompleted: (ctx, e) => {
-        console.warn('GUARD');
-        console.log(ctx);
-        let formCompleted = true;
-        Object.entries(ctx.inputValues).forEach((inputValue) => {
-          if (!inputValue) {
-            formCompleted = false;
-            return;
+        console.warn('GUARD', ctx);
+        return Object.entries(ctx.inputValues).every((input) => {
+          const [key, value] = input;
+          if (!value) {
+            return false;
           }
+          return true;
         });
-        return formCompleted;
       },
-    }
+    },
   }
 );
