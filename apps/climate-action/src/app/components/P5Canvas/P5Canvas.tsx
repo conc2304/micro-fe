@@ -1,5 +1,5 @@
 import p5Types from 'p5';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Sketch from 'react-p5';
 import { getDocumentDimensions } from '../../services/utils';
 import './P5Canvas.module.scss';
@@ -9,18 +9,33 @@ export interface P5CanvasProps {}
 export function P5Canvas(props: P5CanvasProps) {
   const dampening = 0.995;
   const { width, height } = getDocumentDimensions();
+  const [pageWidth, setWidth] = useState(width);
+  const [pageHeight, setHeight] = useState(height);
 
   let cols: number;
   let rows: number;
   let current: number[][];
   let previous: number[][];
 
+
+  // recalculate the page dimensions
+  useEffect(() => {
+    const { scrollWidth, scrollHeight } = document.getElementById('root') || {
+      scrollHeight: 0,
+      scrollWidth: 0,
+    };
+
+    console.log(scrollWidth, scrollHeight)
+    setWidth(Math.max(width, scrollWidth || 0));
+    setHeight(Math.max(height, scrollHeight || 0));
+  }, []);
+
   const setup = (p5: p5Types, canvasParentRef: Element) => {
-    p5.createCanvas(width, height).parent(canvasParentRef);
+    p5.createCanvas(pageWidth, pageHeight).parent(canvasParentRef);
     p5.pixelDensity(1);
 
-    cols = width;
-    rows = height;
+    cols = pageWidth;
+    rows = pageHeight;
     // The following line initializes a 2D cols-by-rows array with zeroes
     // in every array cell, and is equivalent to this Processing line:
     // current = new float[cols][rows];

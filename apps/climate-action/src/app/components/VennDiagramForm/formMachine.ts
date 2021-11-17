@@ -39,13 +39,9 @@ const onSubmit = (formData: InputFieldNames) => {
     remoteApiPostData(url, data)
       .then((response) => {
         console.log(response);
-        return response;
-      })
-      .then((response) => {
-        console.log('SUCCESS');
+        const formPosIDtData = JSON.stringify({name: formData.name, 'created at': createdAt})
+        localStorage.setItem('formPostID', formPosIDtData);
         resolve('SUCCESS');
-        const formPostData = JSON.stringify({name: formData.name, 'created at': createdAt})
-        localStorage.setItem('formPost', formPostData);
       })
       .catch((e) => {
         console.log(e);

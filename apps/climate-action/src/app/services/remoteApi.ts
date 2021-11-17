@@ -7,7 +7,7 @@ const basePostConfig: RequestInit = {
 };
 
 export const remoteApiPostData = async (
-  url = '',
+  url: string,
   data = {},
   customConfig: RequestInit = {}
 ) => {
@@ -16,6 +16,12 @@ export const remoteApiPostData = async (
     ...customConfig,
     body: JSON.stringify(data),
   });
+
+  return response.json();
+};
+
+export const remoteApiGetData = async (url: string, config = {}) => {
+  const response = await fetch(url, config);
 
   return response.json();
 };

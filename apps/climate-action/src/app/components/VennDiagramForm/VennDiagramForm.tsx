@@ -49,8 +49,6 @@ export function VennDiagramForm(props: VennDiagramFormProps) {
       }}
       className={styles.venn_diagram_form}
     >
-      <h2>Climate Action Venn Diagram </h2>
-
       <div>
         {!current.matches('success') &&
           formFields.map(({ id, label, placeholder }) => {
