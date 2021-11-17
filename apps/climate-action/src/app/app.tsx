@@ -17,11 +17,7 @@ export function App() {
 
       <main>
         <YouTubeEmbed embedId={CLIMATE_YT_EMBDED_ID} />
-        <VennDiagramForm
-          formFields={formFields}
-          // onChangeHandler={onChangeHandler}
-          // onSubmitHandler={onSubmitHandler}
-        />
+        <VennDiagramForm formFields={formFields} />
       </main>
     </div>
   );

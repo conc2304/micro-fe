@@ -3,6 +3,7 @@
   min-width: 300px;
   max-width: 600px;
   margin: 50px auto;
+  position: relative;
 }
 
 .app :global(.gutter-left) {
@@ -20,7 +21,7 @@
 }
 
 .app :global(header) {
-  background-color: #143055;
+  background-color: #307de1;
   color: white;
   padding: 5px;
   border-radius: 3px;
@@ -44,6 +45,7 @@
   text-align: center;
   font-size: 20px;
   margin: 40px 0 10px 0;
+  color: #fff
 }
 
 .app :global(.resources) {

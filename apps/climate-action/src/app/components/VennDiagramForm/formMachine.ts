@@ -1,14 +1,18 @@
 import { assign, createMachine } from 'xstate';
+import { remoteApiPostData } from '../../services/remoteApi';
+import { formIsCompleted } from '../../services/utils';
 
-interface FormContext {
-  inputValues: {
-    name: string;
-    joy: string;
-    magic: string;
-    solutions: string;
-    overlap: string;
-  };
+export interface FormContext {
+  inputValues: InputFieldNames;
   errors: string;
+}
+
+interface InputFieldNames {
+  name: string;
+  joy: string;
+  magic: string;
+  solutions: string;
+  overlap: string;
 }
 
 const initialContext: FormContext = {
@@ -22,18 +26,28 @@ const initialContext: FormContext = {
   errors: '',
 };
 
-const onSubmit = () => {
+const onSubmit = (formData: InputFieldNames) => {
   console.log('SUBMITTING');
   return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const dice = Math.floor(Math.random() * Math.floor(2));
+    const url = `${process.env.NX_SHEETS_BASE_URL}/${process.env.NX_SHEETS_CONNECTION_ID}`;
+    const data = {
+      ...formData,
+      'created at': new Date(),
+    };
 
-      // if (dice === 0)
-      return resolve('SUCCESS');
-      // mock call to save to sheets
-
-      // return reject('FAILURE');
-    }, 1000);
+    remoteApiPostData(url, data)
+      .then((response) => {
+        console.log(response);
+        return response;
+      })
+      .then((response) => {
+        console.log('SUCCESS');
+        resolve('SUCCESS');
+      })
+      .catch((e) => {
+        console.log(e);
+        reject({ status: 'FAIL', error: e });
+      });
   });
 };
 
@@ -51,21 +65,33 @@ export const formMachine = createMachine(
             target: '',
             actions: ['onChange'],
           },
-          SUBMIT: {
-            cond: 'formIsCompleted',
-            target: 'submitting',
-          },
+          SUBMIT: [
+            {
+              cond: 'formIsCompleted',
+              target: 'submitting',
+            },
+            { target: 'editing.error' },
+          ],
         },
         states: {
           pristine: {
             entry: ['clearForm'],
           },
-          error: {},
+          dirty: {
+
+          },
+          error: {
+            on: {
+              CHANGE: {
+                target: 'dirty',
+              },
+            },
+          },
         },
       },
       submitting: {
         invoke: {
-          src: () => onSubmit(),
+          src: (ctx, _) => onSubmit(ctx.inputValues),
           onDone: 'success',
           onError: {
             target: 'editing.error',
@@ -93,29 +119,20 @@ export const formMachine = createMachine(
         },
       }),
       onError: assign({
-        errors: (_ctx, e: any) => {
+        errors: (ctx, e: any) => {
           console.log(e);
-          return e.data;
+          return formIsCompleted(ctx, e)
+            ? 'Please fill out the entire form.'
+            : e.data.toString();
         },
       }),
-      clearForm: () => {
-        assign({
-          inputValues: () => initialContext.inputValues,
-          errors: () => initialContext.errors,
-        });
-      },
+      clearForm: assign({
+        errors: () => initialContext.errors,
+        inputValues: () => initialContext.inputValues,
+      }),
     },
     guards: {
-      formIsCompleted: (ctx, e) => {
-        console.warn('GUARD', ctx);
-        return Object.entries(ctx.inputValues).every((input) => {
-          const [key, value] = input;
-          if (!value) {
-            return false;
-          }
-          return true;
-        });
-      },
+      formIsCompleted,
     },
   }
 );

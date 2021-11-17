@@ -1,3 +1,5 @@
+import { FormContext } from "../components/VennDiagramForm/formMachine";
+
 export interface Dimension2d {
   width: number;
   height: number;
@@ -27,3 +29,13 @@ export const getDocumentDimensions = (): Dimension2d => {
     height,
   };
 };
+
+export const formIsCompleted = (ctx: FormContext, _event: any) => {
+  return Object.entries(ctx.inputValues).every((input) => {
+    const [key, value] = input;
+    if (!value) {
+      return false;
+    }
+    return true;
+  });
+}

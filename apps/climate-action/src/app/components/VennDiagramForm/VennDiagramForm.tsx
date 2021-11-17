@@ -1,6 +1,8 @@
+import { CircularProgress, Typography } from '@material-ui/core';
 import { Save } from '@mui/icons-material';
 import { Box, Button, TextField } from '@mui/material';
 import { useMachine } from '@xstate/react';
+import { formIsCompleted } from '../../services/utils';
 import { FormField } from './formFields';
 import { formMachine } from './formMachine';
 import styles from './VennDiagramForm.module.scss';
@@ -26,22 +28,16 @@ export function VennDiagramForm(props: VennDiagramFormProps) {
     });
   };
 
-  const onChangeHandler = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    id: string
-  ) => {
-    const value = event.target.value;
+  const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
     send({
       type: 'CHANGE',
       data: {
         value,
-        key: id,
+        key: name,
       },
     } as any);
-    console.log(event.target.value, id);
-    console.log(current);
   };
-  console.log('NOW', current);
 
   return (
     <Box
@@ -51,9 +47,10 @@ export function VennDiagramForm(props: VennDiagramFormProps) {
       sx={{
         '& .MuiTextField-root': { m: 1 },
       }}
+      className={styles.venn_diagram_form}
     >
-      <h1 style={{ color: 'white' }}>Climate Action Venn Diagram</h1>
-      {current.context.errors && <h3>ERROR</h3>}
+      <h2>Climate Action Venn Diagram </h2>
+
       <div>
         {!current.matches('success') &&
           formFields.map(({ id, label, placeholder, value }) => {
@@ -63,6 +60,7 @@ export function VennDiagramForm(props: VennDiagramFormProps) {
                   style={{ backgroundColor: 'white' }}
                   required
                   id={id}
+                  name={id}
                   label={label}
                   placeholder={placeholder}
                   value={current.context.inputValues[id]}
@@ -70,34 +68,72 @@ export function VennDiagramForm(props: VennDiagramFormProps) {
                   size="medium"
                   fullWidth
                   color="primary"
+                  helperText={
+                    !!current.context.errors &&
+                    current.context.inputValues[id] === '' &&
+                    'Required'
+                  }
+                  error={
+                    !!current.context.errors &&
+                    current.context.inputValues[id] === ''
+                  }
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    onChangeHandler(e, id);
+                    onChangeHandler(e);
                   }}
                   variant="filled"
                 />
               </div>
             );
           })}
-        {current.matches('success') && (
-          <Button
-            onClick={() => {
-              send({ type: 'AGAIN' });
-            }}
-          >
-            LETS GO AGAIN
-          </Button>
-        )}
 
-        <div className={styles.submit_wrapper}>
-          <Button
-            type="submit"
-            variant="contained"
-            size="large"
-            endIcon={<Save />}
-            onClick={onSubmitHandler}
-          >
-            Submit
-          </Button>
+        {current.context.errors ||
+          (current.toStrings().includes('editing.error') && (
+            <p style={{ color: '#fff', textAlign: 'center' }}>
+              Please fill out all of the fields
+            </p>
+          ))}
+
+        <div className={styles.button_wrapper}>
+          {!current.matches('success') && (
+            <Button
+              type="submit"
+              style={{ marginTop: '1em' }}
+              variant="contained"
+              size="large"
+              endIcon={
+                current.matches('submitting') ? (
+                  <CircularProgress
+                    variant="indeterminate"
+                    disableShrink={false}
+                  />
+                ) : (
+                  <Save />
+                )
+              }
+              onClick={onSubmitHandler}
+              color="primary"
+              // disabled={!formIsCompleted(current.context, null)}
+            >
+              {current.matches('submitting') ? 'Submitting' : 'Submit'}
+            </Button>
+          )}
+
+          {current.matches('success') && (
+            <Button
+              color="success"
+              variant="contained"
+              fullWidth={true}
+              onClick={() => {
+                send({ type: 'AGAIN' });
+              }}
+            >
+              <div style={{ fontSize: '2 em' }}>
+                Have another Climate Action idea?
+                <br />
+                <strong>Let's Hear It!</strong>
+              </div>
+            </Button>
+          )}
         </div>
       </div>
     </Box>
