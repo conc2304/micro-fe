@@ -8,7 +8,7 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/apps/climate-action",
+        "outputPath": "apps/climate-action/dist",
         "index": "apps/climate-action/src/index.html",
         "baseHref": "/",
         "main": "apps/climate-action/src/main.tsx",
